@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"flag"
+	"github.com/namsral/flag"
 	"sync"
 	"strings"
 	"log"

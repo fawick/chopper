@@ -6,11 +6,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/julienschmidt/httprouter"
 	"strconv"
-	"github.com/tingold/squirrelchopper/tiles"
-	"flag"
-	"github.com/tingold/squirrelchopper/handler"
-	"github.com/tingold/squirrelchopper/utils"
 
+	"github.com/ruptivespatial/chopper/handler"
+	"github.com/ruptivespatial/chopper/utils"
+	"github.com/ruptivespatial/chopper/tiles"
+	"github.com/namsral/flag"
+	"github.com/ruptivespatial/chopper/tiles"
 )
 
 var tm *tiles.TileManager
