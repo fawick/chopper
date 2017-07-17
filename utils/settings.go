@@ -35,6 +35,9 @@ type settings struct{
 	cacheSizeMB int
 	dbs []string
 	loglevel int
+	proxyHostname string
+	proxyPort string
+	proxyScheme string
 
 }
 func GetSettings() *settings {
@@ -43,6 +46,15 @@ func GetSettings() *settings {
 		instance.init()
 	})
 	return instance
+}
+func (s *settings) GetHostname() (string){
+	return s.proxyHostname
+}
+func (s *settings) GetProxyPort() (string){
+	return s.proxyPort
+}
+func (s *settings) GetProxyScheme() (string){
+	return s.proxyScheme
 }
 func (s *settings) GetPort() (int){
 	return s.port
@@ -79,6 +91,12 @@ func (s *settings) init(){
 	flag.IntVar(&s.port,"port", 8000,"The port number")
 	flag.BoolVar(&s.help,"help",false,"This message")
 	flag.IntVar(&s.cacheSizeMB,"cacheSize", 200,"The size of the in memeory cache (in MB)")
+	//Proxy Settings
+	flag.StringVar(&s.proxyHostname,"proxyhostname", "localhost","For Proxies -- The hostname that should be advertized")
+	flag.StringVar(&s.proxyPort,"proxyport", "8000","For Proxies -- The port that should be advertized")
+	flag.StringVar(&s.proxyScheme,"proxyscheme","https","For Proxies -- The hostname that should be advertized")
+
+
 	flag.Parse()
 	//Split DBs
 	log.Printf("Log level: %v",level)
