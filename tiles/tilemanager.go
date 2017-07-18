@@ -17,8 +17,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"github.com/tingold/squirrelchopper/utils"
-
+	"github.com/ruptivespatial/chopper/utils"
 )
 
 

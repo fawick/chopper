@@ -14,7 +14,7 @@ package tiles
 import (
 	"sync"
 	"math"
-	"github.com/tingold/squirrelchopper/utils"
+	"github.com/ruptivespatial/chopper/utils"
 )
 
 

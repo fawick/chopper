@@ -12,6 +12,7 @@
 package utils
 
 import (
+
 	"github.com/namsral/flag"
 	"sync"
 	"strings"
@@ -20,7 +21,7 @@ import (
 
 /**
 Singleton settings type to share settings across the codebase
- */
+*/
 
 var once sync.Once
 var instance *settings
@@ -38,14 +39,19 @@ type settings struct{
 	proxyHostname string
 	proxyPort string
 	proxyScheme string
-
+	enableProxySettings bool
+	mux sync.Mutex
 }
 func GetSettings() *settings {
 	once.Do(func() {
 		instance =  &settings{}
-		instance.init()
+		instance.setup()
+
 	})
 	return instance
+}
+func (s *settings) GetEnableProxySettings() (bool){
+	return s.enableProxySettings
 }
 func (s *settings) GetHostname() (string){
 	return s.proxyHostname
@@ -80,9 +86,13 @@ func (s *settings) GetSslCert() (string){
 func (s *settings) GetLevel() (int){
 	return s.loglevel
 }
-func (s *settings) init(){
+func (s *settings) setup(){
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	if(flag.Parsed()){ return }
 	var level string
+
 	flag.StringVar(&s.dbString,"db", "resources/ireland.mbtiles", "The MBTiles Database -- multiple can be specified by seperating the paths via commas")
 	flag.BoolVar(&s.ssl,"ssl", true, "Whether to use SSL -- disabling SSL will also disable HTTP2 -- enabled by default")
 	flag.StringVar(&s.sslKey,"key", "resources/test.key", "The ssl private key")
@@ -91,17 +101,20 @@ func (s *settings) init(){
 	flag.IntVar(&s.port,"port", 8000,"The port number")
 	flag.BoolVar(&s.help,"help",false,"This message")
 	flag.IntVar(&s.cacheSizeMB,"cacheSize", 200,"The size of the in memeory cache (in MB)")
-	//Proxy Settings
+	flag.BoolVar(&s.enableProxySettings,"proxy",false,"For Proxies -- Whether to enable proxy settings or just use whatever hostname is found in the http request headers")
 	flag.StringVar(&s.proxyHostname,"proxyhostname", "localhost","For Proxies -- The hostname that should be advertized")
 	flag.StringVar(&s.proxyPort,"proxyport", "8000","For Proxies -- The port that should be advertized")
 	flag.StringVar(&s.proxyScheme,"proxyscheme","https","For Proxies -- The hostname that should be advertized")
-
 
 	flag.Parse()
 	//Split DBs
 	log.Printf("Log level: %v",level)
 	s.dbs = make([]string,0)
+	if(len(s.dbString) == 0){
+		log.Fatal("No Database specified! use -db to set one....")
+	}
 	if(strings.Contains(s.dbString,",")) {
+		log.Printf("here")
 		s.dbs = strings.Split(s.dbString, ",")
 	} else {
 		s.dbs = append(s.dbs, s.dbString)
@@ -123,6 +136,7 @@ func (s *settings) init(){
 		s.loglevel = 4
 		break;
 	}
+
 }
 
 

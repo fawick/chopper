@@ -21,7 +21,6 @@ import (
 	"github.com/ruptivespatial/chopper/utils"
 	"github.com/ruptivespatial/chopper/tiles"
 	"github.com/namsral/flag"
-
 )
 
 var tm *tiles.TileManager
@@ -39,9 +38,9 @@ func main() {
 	logger := utils.GetLogging()
 
 	logger.Debug("Setting up tile manager with data from %v", settings.GetDBs())
-	//initialize the tile manager with one or mone databases
-	tm = tiles.NewTileManager(settings.GetDBs(), true)
+	//initialize the tile manager with one or more databases
 	th = new(handler.Tilehandler)
+	tm = tiles.NewTileManager(settings.GetDBs(), true)
 	th.Manager = *tm
 
 	//create the HTTP Router -- the tiles go to the tilehandler which uses the tile manager to access the DB
@@ -49,6 +48,9 @@ func main() {
 	router := httprouter.New()
 	router.GET("/tiles/:z/:x/:y", th.Handle)
 
+	//this is a work around to rewrite values in the json file as the Mapbox style format doesn't support relative paths
+	ph := handler.NewProxyHostHandler(assetFS())
+	router.GET("/style/osm-liberty.json",ph.Handle)
 
 	//any non tile request will default to serving files
 	//files are NOT actually files but stored in GO code using
@@ -73,7 +75,7 @@ func main() {
 	} else {
 		error := srv.ListenAndServe()
 		if(error != nil){
-			logger..Fatalf("Failed to start server: %v",error)
+			logger.Fatal("Failed to start server: %v",error)
 		}
 	}
 

@@ -14,7 +14,7 @@ package tiles
 import (
 	"math"
 	"strconv"
-	"github.com/tingold/squirrelchopper/utils"
+	"github.com/ruptivespatial/chopper/utils"
 )
 
 type tile struct {

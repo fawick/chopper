@@ -11,10 +11,6 @@
  */
 package utils
 
-import (
-	"sync"
-	"fmt"
-)
 
 import (
 	"sync"
