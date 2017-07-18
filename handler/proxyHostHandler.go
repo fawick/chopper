@@ -17,7 +17,6 @@ import ("github.com/julienschmidt/httprouter"
 	"github.com/ruptivespatial/chopper/utils"
 	"fmt"
 	"strings"
-	"bytes"
 	"github.com/elazarl/go-bindata-assetfs"
 
 )
@@ -35,7 +34,8 @@ func (phh *proxyHostHandler) Handle(w http.ResponseWriter, r *http.Request, ps h
 
 
 	logger := utils.GetLogging()
-	data, err := phh.bdfs.Asset(strings.TrimPrefix(r.URL.Path,"/"))
+	//data, err := phh.bdfs.Asset(strings.TrimPrefix(r.URL.Path,"/"))
+	data, err := phh.bdfs.Asset("static_source"+r.URL.Path)
 	if(err != nil){
 		logger.Warn("File not found: %v",err);
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -44,7 +44,7 @@ func (phh *proxyHostHandler) Handle(w http.ResponseWriter, r *http.Request, ps h
 		fmt.Fprintln(w, "Not Found")
 		return
 	}
-	n := bytes.Index(data, []byte{0})
+	n := len(data)
 	fileString := string(data[:n])
 
 	var newhostname string
@@ -53,11 +53,15 @@ func (phh *proxyHostHandler) Handle(w http.ResponseWriter, r *http.Request, ps h
 		logger.Debug("Using PROXY values to rewrite json")
 	} else{
 		logger.Debug("Using request values to rewrite json")
-		newhostname = r.URL.Scheme+"://"+ r.Host+r.URL.Port()
+		if(utils.GetSettings().GetSsl()){
+			newhostname = "https://"
+		} else{
+			newhostname = "http://"
+		}
+		newhostname += r.Host
 	}
 
-
-	logger.Debug("Setting hostname to %v",newhostname)
+	logger.Debug("Setting base URLs to %v",newhostname)
 	reformattedString := strings.Replace(fileString,"https://localhost:8000",newhostname,-1);
 	w.Write([]byte(reformattedString))
 

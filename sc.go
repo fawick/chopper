@@ -50,7 +50,10 @@ func main() {
 
 	//this is a work around to rewrite values in the json file as the Mapbox style format doesn't support relative paths
 	ph := handler.NewProxyHostHandler(assetFS())
+	router.GET("/style/osm-liberty/osm-liberty.json",ph.Handle)
 	router.GET("/style/osm-liberty.json",ph.Handle)
+	router.GET("/style/osm-liberty@2x.json",ph.Handle)
+	router.GET("/style/osm-liberty/osm-liberty@2x.json",ph.Handle)
 
 	//any non tile request will default to serving files
 	//files are NOT actually files but stored in GO code using
