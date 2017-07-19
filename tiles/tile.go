@@ -12,9 +12,9 @@
 package tiles
 
 import (
+	"github.com/ruptivespatial/chopper/utils"
 	"math"
 	"strconv"
-	"github.com/ruptivespatial/chopper/utils"
 )
 
 type tile struct {
@@ -25,21 +25,22 @@ type tile struct {
 	long float64
 	Data []byte
 }
+
 /** Utility functions **/
-func (t *tile) ZStr() (string){
+func (t *tile) ZStr() string {
 	return strconv.Itoa(t.z)
 }
-func (t *tile) XStr() (string){
+func (t *tile) XStr() string {
 	return strconv.Itoa(t.x)
 }
-func (t *tile) YStr() (string){
+func (t *tile) YStr() string {
 	return strconv.Itoa(t.y)
 }
-func (t *tile) GetUrl() (string){
-	return "/tiles/"+t.ZStr()+"/"+t.XStr()+"/"+t.YStr()+".pbf"
+func (t *tile) GetUrl() string {
+	return "/tiles/" + t.ZStr() + "/" + t.XStr() + "/" + t.YStr() + ".pbf"
 }
 
-func NewTile(z int, x int, y int) (*tile){
+func NewTile(z int, x int, y int) *tile {
 	t := new(tile)
 	t.z = z
 	t.y = y
@@ -47,19 +48,18 @@ func NewTile(z int, x int, y int) (*tile){
 
 	return t
 }
-func NewTileStr(z string, x string, y string) (*tile){
+func NewTileStr(z string, x string, y string) *tile {
 	var err error
 	t := new(tile)
 	t.z, err = strconv.Atoi(z)
 	t.y, err = strconv.Atoi(y)
 	t.x, err = strconv.Atoi(x)
-	if(err != nil){
+	if err != nil {
 		utils.GetLogging().Error("error parsing value from string in tile coordinate")
 
 	}
 	return t
 }
-
 
 type Conversion interface {
 	deg2num(t *tile) (x int, y int)

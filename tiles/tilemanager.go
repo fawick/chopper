@@ -12,41 +12,39 @@
 package tiles
 
 import (
-	"github.com/allegro/bigcache"
 	"database/sql"
+	"github.com/allegro/bigcache"
+	"github.com/ruptivespatial/chopper/utils"
 	"os"
 	"strconv"
 	"time"
-	"github.com/ruptivespatial/chopper/utils"
 )
 
-
-type TileManager struct
-{
-
-	 cache *bigcache.BigCache
-	 dbs []*sql.DB
-	 prepStmts []*sql.Stmt
-	 fullyCached bool
-
+type TileManager struct {
+	cache       *bigcache.BigCache
+	dbs         []*sql.DB
+	prepStmts   []*sql.Stmt
+	fullyCached bool
 }
 
-func (tm *TileManager) GetTile(z string, x string, y string) (*tile){
+func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 
-	tile := NewTileStr(z,x,y)
+	tile := NewTileStr(z, x, y)
 	var tiledata []byte
-	key := buildKey(z,x,y)
+	key := buildKey(z, x, y)
 	tiledata, err := tm.cache.Get(key)
 
 	//if tile is empty we can check the DBs unless we know everything is already loaded in the cache
-	if tile == nil|| err != nil {
+	if tile == nil || err != nil {
 
-		if !tm.fullyCached{
+		if !tm.fullyCached {
 			//iterate over databases and look for a tile
 			for _, stmt := range tm.prepStmts {
 				row := stmt.QueryRow(z, x, y)
 				row.Scan(&tiledata)
-				if(tiledata != nil){break}
+				if tiledata != nil {
+					break
+				}
 			}
 		}
 	}
@@ -54,31 +52,29 @@ func (tm *TileManager) GetTile(z string, x string, y string) (*tile){
 	return tile
 }
 
-func NewTileManager(mbtilePath []string, useCache bool) *TileManager{
+func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 	tm := TileManager{}
 	utils.GetLogging().Info("Initializing tile manager...")
 
-
-
 	//initialize cache....100mb by default
-	config :=bigcache.Config{Shards: 1024,Verbose: false, HardMaxCacheSize: utils.GetSettings().GetCacheSizeMB() * 1000 }
+	config := bigcache.Config{Shards: 1024, Verbose: false, HardMaxCacheSize: utils.GetSettings().GetCacheSizeMB() * 1000}
 	cache, initErr := bigcache.NewBigCache(config)
 	tm.cache = cache
 
-	if initErr != nil{
+	if initErr != nil {
 		utils.GetLogging().Error("Error creating cache!")
 	}
 	utils.GetLogging().Debug("Cache initialized")
 
-	var conns = make([]*sql.DB,0)
-	var preps = make([]*sql.Stmt,0)
+	var conns = make([]*sql.DB, 0)
+	var preps = make([]*sql.Stmt, 0)
 
 	for _, connStr := range mbtilePath {
 
 		fi, err := os.Stat(connStr)
-		if err != nil{
-			utils.GetLogging().Error("Database %v does not exist...exiting",connStr)
+		if err != nil {
+			utils.GetLogging().Error("Database %v does not exist...exiting", connStr)
 			continue
 		}
 
@@ -90,14 +86,14 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager{
 		}
 
 		//see if we can fit the whole thing...
-		if fi.Size() < int64(utils.GetSettings().GetCacheSizeMB()) * 1000000 {
-			utils.GetLogging().Info("Database %v is %v MB....going to try to fit it into RAM",connStr, fi.Size() / 1000000)
+		if fi.Size() < int64(utils.GetSettings().GetCacheSizeMB())*1000000 {
+			utils.GetLogging().Info("Database %v is %v MB....going to try to fit it into RAM", connStr, fi.Size()/1000000)
 
 			for i := 0; i < 15; i++ {
 				loadTileLevelIntoCache(i, db, cache)
 			}
 		} else {
-			utils.GetLogging().Info("Database %v is %v MB - too big to cache",connStr,fi.Size() / 1000000)
+			utils.GetLogging().Info("Database %v is %v MB - too big to cache", connStr, fi.Size()/1000000)
 		}
 
 		var count int
@@ -107,7 +103,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager{
 
 		////prepare statement
 		prepStmt, err := db.Prepare("SELECT tile_data as tile FROM tiles where zoom_level=? AND tile_column=? AND tile_row=?")
-		preps = append(preps,prepStmt)
+		preps = append(preps, prepStmt)
 
 	}
 	tm.prepStmts = preps
@@ -117,16 +113,15 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager{
 
 }
 
-func buildKey(z string, x string, y string) (string){
-	return y+"_"+x+"_"+z
+func buildKey(z string, x string, y string) string {
+	return y + "_" + x + "_" + z
 }
 
 func loadTileLevelIntoCache(zoom int, database *sql.DB, cache *bigcache.BigCache) {
 
-
 	start := time.Now()
 
-	rows, err := database.Query("SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles where zoom_level="+strconv.Itoa(zoom))
+	rows, err := database.Query("SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles where zoom_level=" + strconv.Itoa(zoom))
 
 	defer rows.Close()
 	var tilecount int = 0
@@ -136,18 +131,17 @@ func loadTileLevelIntoCache(zoom int, database *sql.DB, cache *bigcache.BigCache
 		var tile_column int
 		var tile_row int
 		var tile []byte
-		err = rows.Scan(&zoom_level, &tile_column,&tile_row,&tile )
+		err = rows.Scan(&zoom_level, &tile_column, &tile_row, &tile)
 		if err != nil {
-			utils.GetLogging().Error("Error loading row: %v",err)
+			utils.GetLogging().Error("Error loading row: %v", err)
 			continue
 		}
-		var key string = buildKey(strconv.Itoa(tile_row),strconv.Itoa(tile_column),strconv.Itoa(zoom_level))
+		var key string = buildKey(strconv.Itoa(tile_row), strconv.Itoa(tile_column), strconv.Itoa(zoom_level))
 		//log.Println(key)
-		cache.Set(key,tile)
+		cache.Set(key, tile)
 	}
 	elapsed := time.Since(start)
 
-	utils.GetLogging().Info("Finished loading level %v (%v tiles) in %s", zoom,tilecount,elapsed)
-
+	utils.GetLogging().Info("Finished loading level %v (%v tiles) in %s", zoom, tilecount, elapsed)
 
 }

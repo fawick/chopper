@@ -14,8 +14,7 @@ package tiles
 //import "database/sql"
 
 type dbMetadata struct {
-
-	metadata map [string]string
+	metadata map[string]string
 }
 
 //metadata dbMetadata

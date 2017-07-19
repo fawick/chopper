@@ -12,19 +12,20 @@
 
 package handler
 
-import ("github.com/julienschmidt/httprouter"
-        "net/http"
-	"github.com/ruptivespatial/chopper/utils"
+import (
 	"fmt"
-	"strings"
 	"github.com/elazarl/go-bindata-assetfs"
-
+	"github.com/julienschmidt/httprouter"
+	"github.com/ruptivespatial/chopper/utils"
+	"net/http"
+	"strings"
 )
 
-type proxyHostHandler struct{
+type proxyHostHandler struct {
 	bdfs *assetfs.AssetFS
 }
-func NewProxyHostHandler(fs *assetfs.AssetFS) (*proxyHostHandler) {
+
+func NewProxyHostHandler(fs *assetfs.AssetFS) *proxyHostHandler {
 	phh := new(proxyHostHandler)
 	phh.bdfs = fs
 	return phh
@@ -32,12 +33,11 @@ func NewProxyHostHandler(fs *assetfs.AssetFS) (*proxyHostHandler) {
 
 func (phh *proxyHostHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-
 	logger := utils.GetLogging()
 	//data, err := phh.bdfs.Asset(strings.TrimPrefix(r.URL.Path,"/"))
-	data, err := phh.bdfs.Asset("static_source"+r.URL.Path)
-	if(err != nil){
-		logger.Warn("File not found: %v",err);
+	data, err := phh.bdfs.Asset("static_source" + r.URL.Path)
+	if err != nil {
+		logger.Warn("File not found: %v", err)
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.WriteHeader(404)
@@ -48,22 +48,21 @@ func (phh *proxyHostHandler) Handle(w http.ResponseWriter, r *http.Request, ps h
 	fileString := string(data[:n])
 
 	var newhostname string
-	if(utils.GetSettings().GetEnableProxySettings()) {
+	if utils.GetSettings().GetEnableProxySettings() {
 		newhostname = utils.GetSettings().GetProxyScheme() + "://" + utils.GetSettings().GetHostname() + ":" + utils.GetSettings().GetProxyPort()
 		logger.Debug("Using PROXY values to rewrite json")
-	} else{
+	} else {
 		logger.Debug("Using request values to rewrite json")
-		if(utils.GetSettings().GetSsl()){
+		if utils.GetSettings().GetSsl() {
 			newhostname = "https://"
-		} else{
+		} else {
 			newhostname = "http://"
 		}
 		newhostname += r.Host
 	}
 
-	logger.Debug("Setting base URLs to %v",newhostname)
-	reformattedString := strings.Replace(fileString,"https://localhost:8000",newhostname,-1);
+	logger.Debug("Setting base URLs to %v", newhostname)
+	reformattedString := strings.Replace(fileString, "https://localhost:8000", newhostname, -1)
 	w.Write([]byte(reformattedString))
-
 
 }
