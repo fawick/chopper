@@ -38,6 +38,7 @@ func (t *tile) YStr() string {
 func (t *tile) GetURL() string {
 	return "/tiles/" + t.ZStr() + "/" + t.XStr() + "/" + t.YStr() + ".pbf"
 }
+
 //NewTile creates a tile with the given z/x/y
 func NewTile(z int, x int, y int) *tile {
 	t := new(tile)
@@ -47,6 +48,7 @@ func NewTile(z int, x int, y int) *tile {
 
 	return t
 }
+
 //NewTileStr creates a tile with the given z/x/y but in string format
 func NewTileStr(z string, x string, y string) *tile {
 	var err error
@@ -60,4 +62,3 @@ func NewTileStr(z string, x string, y string) *tile {
 	}
 	return t
 }
-

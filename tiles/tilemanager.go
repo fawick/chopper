@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"time"
 )
+
 //TileManager manages the retrieval and caching of tiles
 type TileManager struct {
 	cache       *bigcache.BigCache
@@ -26,6 +27,7 @@ type TileManager struct {
 	prepStmts   []*sql.Stmt
 	fullyCached bool
 }
+
 //GetTile returns a tile based on a z/x/y request
 func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 
@@ -51,6 +53,7 @@ func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 	tile.Data = tiledata
 	return tile
 }
+
 //NewTileManager creates an instance of a tile manager based on a list of mbtile files
 func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
