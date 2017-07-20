@@ -65,7 +65,7 @@ func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprou
 				if adjtile == nil {
 					continue
 				}
-				url := adjtile.GetUrl()
+				url := adjtile.GetURL()
 				//log.Printf("Pushing tile %v",url)
 				pusher.Push(url, options)
 			}

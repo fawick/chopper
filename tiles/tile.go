@@ -1,4 +1,4 @@
-/*
+/*Package tiles ...
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@ package tiles
 
 import (
 	"github.com/ruptivespatial/chopper/utils"
-	"math"
 	"strconv"
 )
 
@@ -36,10 +35,10 @@ func (t *tile) XStr() string {
 func (t *tile) YStr() string {
 	return strconv.Itoa(t.y)
 }
-func (t *tile) GetUrl() string {
+func (t *tile) GetURL() string {
 	return "/tiles/" + t.ZStr() + "/" + t.XStr() + "/" + t.YStr() + ".pbf"
 }
-
+//NewTile creates a tile with the given z/x/y
 func NewTile(z int, x int, y int) *tile {
 	t := new(tile)
 	t.z = z
@@ -48,6 +47,7 @@ func NewTile(z int, x int, y int) *tile {
 
 	return t
 }
+//NewTileStr creates a tile with the given z/x/y but in string format
 func NewTileStr(z string, x string, y string) *tile {
 	var err error
 	t := new(tile)
@@ -61,20 +61,3 @@ func NewTileStr(z string, x string, y string) *tile {
 	return t
 }
 
-type Conversion interface {
-	deg2num(t *tile) (x int, y int)
-	num2deg(t *tile) (lat float64, long float64)
-}
-
-func (*tile) Deg2num(t *tile) (x int, y int) {
-	x = int(math.Floor((t.long + 180.0) / 360.0 * (math.Exp2(float64(t.z)))))
-	y = int(math.Floor((1.0 - math.Log(math.Tan(t.lat*math.Pi/180.0)+1.0/math.Cos(t.lat*math.Pi/180.0))/math.Pi) / 2.0 * (math.Exp2(float64(t.z)))))
-	return
-}
-
-func (*tile) Num2deg(t *tile) (lat float64, long float64) {
-	n := math.Pi - 2.0*math.Pi*float64(t.y)/math.Exp2(float64(t.z))
-	lat = 180.0 / math.Pi * math.Atan(0.5*(math.Exp(n)-math.Exp(-n)))
-	long = float64(t.x)/math.Exp2(float64(t.z))*360.0 - 180.0
-	return lat, long
-}

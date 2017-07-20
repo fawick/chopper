@@ -1,4 +1,4 @@
-/*
+/*Package tiles ...
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ func (zm *zoomLevelManager) GetLevel(z int) *zoomLevel {
 	return zm.level[z]
 }
 
+//GetZoomLevelManager returns an instance of...
 //TODO this whole thing is a little redundant...
 func GetZoomLevelManager() *zoomLevelManager {
 	once.Do(func() {

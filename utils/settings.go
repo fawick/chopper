@@ -1,4 +1,5 @@
-/*
+/*Package utils ...
+ *
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,7 +25,7 @@ Singleton settings type to share settings across the codebase
 
 var once sync.Once
 var instance *settings
-
+//Settings holds the values parsed out from flags
 type settings struct {
 	port                int
 	dbString            string
@@ -39,9 +40,10 @@ type settings struct {
 	proxyPort           string
 	proxyScheme         string
 	enableProxySettings bool
-	mux                 sync.Mutex
+
 }
 
+//GetSettings returns the setting singleton
 func GetSettings() *settings {
 	once.Do(func() {
 		instance = &settings{}
@@ -50,46 +52,44 @@ func GetSettings() *settings {
 	})
 	return instance
 }
-func (s *settings) GetEnableProxySettings() bool {
+func (s settings) GetEnableProxySettings() bool {
 	return s.enableProxySettings
 }
-func (s *settings) GetHostname() string {
+func (s settings) GetHostname() string {
 	return s.proxyHostname
 }
-func (s *settings) GetProxyPort() string {
+func (s settings) GetProxyPort() string {
 	return s.proxyPort
 }
-func (s *settings) GetProxyScheme() string {
+func (s settings) GetProxyScheme() string {
 	return s.proxyScheme
 }
-func (s *settings) GetPort() int {
+func (s settings) GetPort() int {
 	return s.port
 }
-func (s *settings) GetCacheSizeMB() int {
+func (s settings) GetCacheSizeMB() int {
 	return s.cacheSizeMB
 }
-func (s *settings) GetSsl() bool {
+func (s settings) GetSsl() bool {
 	return s.ssl
 }
-func (s *settings) GetHelp() bool {
+func (s settings) GetHelp() bool {
 	return s.help
 }
-func (s *settings) GetDBs() []string {
+func (s settings) GetDBs() []string {
 	return s.dbs
 }
-func (s *settings) GetSslKey() string {
+func (s settings) GetSslKey() string {
 	return s.sslKey
 }
-func (s *settings) GetSslCert() string {
+func (s settings) GetSslCert() string {
 	return s.sslcert
 }
-func (s *settings) GetLevel() int {
+func (s settings) GetLevel() int {
 	return s.loglevel
 }
 func (s *settings) setup() {
 
-	s.mux.Lock()
-	defer s.mux.Unlock()
 	if flag.Parsed() {
 		return
 	}
@@ -102,11 +102,11 @@ func (s *settings) setup() {
 	flag.StringVar(&level, "loglevel", "INFO", "Log level - one of TRACE, DEBUG, INFO, WARN, ERROR")
 	flag.IntVar(&s.port, "port", 8000, "The port number")
 	flag.BoolVar(&s.help, "help", false, "This message")
-	flag.IntVar(&s.cacheSizeMB, "cacheSize", 200, "The size of the in memeory cache (in MB)")
+	flag.IntVar(&s.cacheSizeMB, "cacheSize", 200, "The size of the in memory cache (in MB)")
 	flag.BoolVar(&s.enableProxySettings, "proxy", false, "For Proxies -- Whether to enable proxy settings or just use whatever hostname is found in the http request headers")
-	flag.StringVar(&s.proxyHostname, "proxyhostname", "localhost", "For Proxies -- The hostname that should be advertized")
-	flag.StringVar(&s.proxyPort, "proxyport", "8000", "For Proxies -- The port that should be advertized")
-	flag.StringVar(&s.proxyScheme, "proxyscheme", "https", "For Proxies -- The hostname that should be advertized")
+	flag.StringVar(&s.proxyHostname, "proxyhostname", "localhost", "For Proxies -- The hostname that should be advertised")
+	flag.StringVar(&s.proxyPort, "proxyport", "8000", "For Proxies -- The port that should be advertised")
+	flag.StringVar(&s.proxyScheme, "proxyscheme", "https", "For Proxies -- The hostname that should be advertised")
 
 	flag.Parse()
 	//Split DBs

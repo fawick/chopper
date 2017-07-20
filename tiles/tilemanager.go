@@ -1,4 +1,4 @@
-/*
+/*Package tiles ...
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import (
 	"strconv"
 	"time"
 )
-
+//TileManager manages the retrieval and caching of tiles
 type TileManager struct {
 	cache       *bigcache.BigCache
 	dbs         []*sql.DB
 	prepStmts   []*sql.Stmt
 	fullyCached bool
 }
-
+//GetTile returns a tile based on a z/x/y request
 func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 
 	tile := NewTileStr(z, x, y)
@@ -51,7 +51,7 @@ func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 	tile.Data = tiledata
 	return tile
 }
-
+//NewTileManager creates an instance of a tile manager based on a list of mbtile files
 func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 	tm := TileManager{}
@@ -124,19 +124,19 @@ func loadTileLevelIntoCache(zoom int, database *sql.DB, cache *bigcache.BigCache
 	rows, err := database.Query("SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles where zoom_level=" + strconv.Itoa(zoom))
 
 	defer rows.Close()
-	var tilecount int = 0
+	var tilecount int
 	for rows.Next() {
 		tilecount++
-		var zoom_level int
-		var tile_column int
-		var tile_row int
+		var zoomLevel int
+		var tileColumn int
+		var tileRow int
 		var tile []byte
-		err = rows.Scan(&zoom_level, &tile_column, &tile_row, &tile)
+		err = rows.Scan(&zoomLevel, &tileColumn, &tileRow, &tile)
 		if err != nil {
 			utils.GetLogging().Error("Error loading row: %v", err)
 			continue
 		}
-		var key string = buildKey(strconv.Itoa(tile_row), strconv.Itoa(tile_column), strconv.Itoa(zoom_level))
+		var key = buildKey(strconv.Itoa(tileRow), strconv.Itoa(tileColumn), strconv.Itoa(zoomLevel))
 		//log.Println(key)
 		cache.Set(key, tile)
 	}

@@ -1,4 +1,4 @@
-/*
+/*Package utils ...
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import (
 var oneTime sync.Once
 var logInstance *logging
 
-const TRACE int = 0
-const DEBUG int = 1
-const INFO int = 2
-const WARN int = 3
+const trace int = 0
+const debug int = 1
+const info int = 2
+const warn int = 3
 
 //const ERROR int = 4
 
@@ -32,7 +32,7 @@ type logging struct {
 	logStream chan string
 	level     int
 }
-
+//GetLogging returns the logging singleton
 func GetLogging() *logging {
 	oneTime.Do(func() {
 		logInstance = &logging{}
@@ -48,22 +48,22 @@ func (l *logging) init() {
 }
 
 func (l *logging) Trace(s string, v ...interface{}) {
-	if l.level == TRACE {
+	if l.level == trace {
 		l.logStream <- "TRACE: " + fmt.Sprintf(s, v...)
 	}
 }
 func (l *logging) Debug(s string, v ...interface{}) {
-	if l.level <= DEBUG {
+	if l.level <= debug {
 		l.logStream <- "DEBUG: " + fmt.Sprintf(s, v...)
 	}
 }
 func (l *logging) Info(s string, v ...interface{}) {
-	if l.level <= INFO {
+	if l.level <= info {
 		l.logStream <- "INFO: " + fmt.Sprintf(s, v...)
 	}
 }
 func (l *logging) Warn(s string, v ...interface{}) {
-	if l.level <= WARN {
+	if l.level <= warn {
 		l.logStream <- "WARN: " + fmt.Sprintf(s, v...)
 	}
 }
