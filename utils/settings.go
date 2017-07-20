@@ -95,7 +95,7 @@ func (s *settings) setup() {
 	}
 	var level string
 
-	flag.StringVar(&s.dbString, "db", "resources/ireland.mbtiles", "The MBTiles Database -- multiple can be specified by seperating the paths via commas")
+	flag.StringVar(&s.dbString, "db", "resources/ireland.mbtiles", "The MBTiles Database -- multiple can be specified by separated the paths via commas")
 	flag.BoolVar(&s.ssl, "ssl", true, "Whether to use SSL -- disabling SSL will also disable HTTP2 -- enabled by default")
 	flag.StringVar(&s.sslKey, "key", "resources/test.key", "The ssl private key")
 	flag.StringVar(&s.sslcert, "cert", "resources/test.crt", "The ssl private cert")

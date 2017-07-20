@@ -1,4 +1,4 @@
-/*
+/*Package handler ...
  * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,10 +26,12 @@ import (
 	"strings"
 )
 
+//Tilehandler implements the handle method and takes care of http crap while delegating to the tilemanager for actual
+//tile retrieval
 type Tilehandler struct {
 	Manager tiles.TileManager
 }
-
+//Handle implements the httprouter method...
 func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var y string = strings.TrimSuffix(ps.ByName("y"), ".pbf")
