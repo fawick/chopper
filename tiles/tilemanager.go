@@ -105,7 +105,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 		utils.GetLogging().Info("Found %v tiles in db", count)
 
 		////prepare statement
-		prepStmt, err := db.Prepare("SELECT tile_data as tile FROM tiles where zoom_level=? AND tile_column=? AND tile_row=?")
+		prepStmt, _ := db.Prepare("SELECT tile_data as tile FROM tiles where zoom_level=? AND tile_column=? AND tile_row=?")
 		preps = append(preps, prepStmt)
 
 	}
