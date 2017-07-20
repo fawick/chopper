@@ -1,5 +1,5 @@
 # Chopper
-![Go Report Card](https://goreportcard.com/badge/github.com/ruptivespatial/chopper "Go Report Card") 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ruptivespatial/chopper)](https://goreportcard.com/report/github.com/ruptivespatial/chopper)
 [![CircleCI](https://circleci.com/gh/ruptivespatial/chopper.svg?style=svg)](https://circleci.com/gh/ruptivespatial/chopper)
 
 Yet another tile server...why? 
