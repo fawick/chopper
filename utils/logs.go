@@ -32,6 +32,7 @@ type logging struct {
 	logStream chan string
 	level     int
 }
+
 //GetLogging returns the logging singleton
 func GetLogging() *logging {
 	oneTime.Do(func() {

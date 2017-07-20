@@ -25,6 +25,7 @@ Singleton settings type to share settings across the codebase
 
 var once sync.Once
 var instance *settings
+
 //Settings holds the values parsed out from flags
 type settings struct {
 	port                int
@@ -40,7 +41,6 @@ type settings struct {
 	proxyPort           string
 	proxyScheme         string
 	enableProxySettings bool
-
 }
 
 //GetSettings returns the setting singleton
