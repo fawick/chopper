@@ -25,6 +25,7 @@ type proxyHostHandler struct {
 	bdfs *assetfs.AssetFS
 }
 
+//NewProxyHostHandler returns an instance
 func NewProxyHostHandler(fs *assetfs.AssetFS) *proxyHostHandler {
 	phh := new(proxyHostHandler)
 	phh.bdfs = fs
