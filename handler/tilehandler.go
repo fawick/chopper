@@ -31,6 +31,7 @@ import (
 type Tilehandler struct {
 	Manager tiles.TileManager
 }
+
 //Handle implements the httprouter method...
 func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
