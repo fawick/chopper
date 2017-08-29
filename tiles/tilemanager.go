@@ -15,9 +15,11 @@ import (
 	"database/sql"
 	"github.com/allegro/bigcache"
 	"github.com/ruptivespatial/chopper/utils"
+	"github.com/tingold/gophertile/gophertile"
 	"os"
 	"strconv"
 	"time"
+	"bytes"
 )
 
 //TileManager manages the retrieval and caching of tiles
@@ -29,15 +31,16 @@ type TileManager struct {
 }
 
 //GetTile returns a tile based on a z/x/y request
-func (tm *TileManager) GetTile(z string, x string, y string) *tile {
+func (tm *TileManager) GetTile(z int, x int, y int) (*gophertile.Tile, []byte) {
+//func (tm *TileManager) GetTile(z string, x string, y string) *T"ile {
 
-	tile := NewTileStr(z, x, y)
+	tile := gophertile.Tile{x,y,z}
 	var tiledata []byte
 	key := buildKey(z, x, y)
 	tiledata, err := tm.cache.Get(key)
 
 	//if tile is empty we can check the DBs unless we know everything is already loaded in the cache
-	if tile == nil || err != nil {
+	if tiledata == nil || err != nil {
 
 		if !tm.fullyCached {
 			//iterate over databases and look for a tile
@@ -50,8 +53,8 @@ func (tm *TileManager) GetTile(z string, x string, y string) *tile {
 			}
 		}
 	}
-	tile.Data = tiledata
-	return tile
+
+	return &tile, tiledata
 }
 
 //NewTileManager creates an instance of a tile manager based on a list of mbtile files
@@ -81,7 +84,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 			continue
 		}
 
-		//// Open database file
+		// Open database file
 		db, err := sql.Open("sqlite3", connStr)
 		conns = append(conns, db)
 		if err != nil {
@@ -116,8 +119,13 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 }
 
-func buildKey(z string, x string, y string) string {
-	return y + "_" + x + "_" + z
+func buildKey(z int, x int, y int) string {
+	buf := bytes.NewBufferString(strconv.Itoa(z))
+	buf.WriteString("_")
+	buf.WriteString(strconv.Itoa(x))
+	buf.WriteString("_")
+	buf.WriteString(strconv.Itoa(z))
+	return buf.String()
 }
 
 func loadTileLevelIntoCache(zoom int, database *sql.DB, cache *bigcache.BigCache) {
@@ -139,8 +147,8 @@ func loadTileLevelIntoCache(zoom int, database *sql.DB, cache *bigcache.BigCache
 			utils.GetLogging().Error("Error loading row: %v", err)
 			continue
 		}
-		var key = buildKey(strconv.Itoa(tileRow), strconv.Itoa(tileColumn), strconv.Itoa(zoomLevel))
-		//log.Println(key)
+		var key = buildKey(tileRow, tileColumn, zoomLevel)
+
 		cache.Set(key, tile)
 	}
 	elapsed := time.Since(start)

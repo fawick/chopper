@@ -16,14 +16,14 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ruptivespatial/chopper/tiles"
+	"github.com/tingold/gophertile/gophertile"
 	"github.com/ruptivespatial/chopper/utils"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"strings"
+	"github.com/ruptivespatial/chopper/tiles"
 )
 
 //Tilehandler implements the handle method and takes care of http crap while delegating to the tilemanager for actual
@@ -35,13 +35,15 @@ type Tilehandler struct {
 //Handle implements the httprouter method...
 func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	var y string = strings.TrimSuffix(ps.ByName("y"), ".pbf")
-	var z string = ps.ByName("z")
+	y,_ := strconv.Atoi(strings.TrimSuffix(ps.ByName("y"), ".pbf"))
+	z,_ := strconv.Atoi(ps.ByName("z"))
+	x, _:= strconv.Atoi(ps.ByName("x"))
 	yInt := normalizeY(y, z)
 
-	t := th.Manager.GetTile(z, ps.ByName("x"), strconv.Itoa(int(yInt)))
+	t, data := th.Manager.GetTile(z, x, int(yInt))
 
-	if t.Data == nil {
+
+	if data == nil {
 		utils.GetLogging().Warn(fmt.Sprintf("Tile not found for %v/%v/%v", ps.ByName("z"), ps.ByName("x"), yInt))
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -50,7 +52,7 @@ func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprou
 		w.Header().Set("Content-type", "application/x-protobuf")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		var buff = bytes.NewBuffer(t.Data)
+		var buff = bytes.NewBuffer(data)
 		r, err := gzip.NewReader(buff)
 		if err != nil {
 			utils.GetLogging().Error("error decompressing tile")
@@ -62,33 +64,32 @@ func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprou
 		if pusher, ok := w.(http.Pusher); ok {
 			//log.Print("HTTP Push is OK")
 			options := &http.PushOptions{}
-			adjecentArray := tiles.GetZoomLevelManager().GetAdjacentTiles(t)
+			kids := t.Children()
 
-			for _, adjtile := range adjecentArray {
-				if adjtile == nil {
+			for _, kid := range kids {
+				if kid == nil {
 					continue
 				}
-				url := adjtile.GetURL()
-				//log.Printf("Pushing tile %v",url)
+				url := buildUrl(t)
 				pusher.Push(url, options)
 			}
 		}
 
 	}
-
 }
-func normalizeY(whyStr string, zStr string) int32 {
+func buildUrl(tile *gophertile.Tile) string{
+	//return "/tiles/" + t.ZStr() + "/" + t.XStr() + "/" + t.YStr() + ".pbf"
+	buf := bytes.NewBufferString("/tiles")
+	buf.WriteString(strconv.Itoa(tile.Z))
+	buf.WriteString("/")
+	buf.WriteString(strconv.Itoa(tile.X))
+	buf.WriteString("/")
+	buf.WriteString(strconv.Itoa(tile.Y))
+	buf.WriteString(".pbf")
+	return buf.String()
+}
 
-	z, err := strconv.Atoi(zStr)
-	if err != nil {
-		log.Printf("error converting val: %v to int", zStr)
-		return -1
-	}
-	y, error := strconv.Atoi(whyStr)
-	if error != nil {
-		log.Printf("error converting val: %v to int", whyStr)
-		return -1
-	}
+func normalizeY(y int, z int) int32 {
 
 	floaty := math.Pow(float64(2.0), float64(z)) - float64(y)
 	floaty--
