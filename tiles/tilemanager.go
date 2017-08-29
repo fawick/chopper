@@ -12,6 +12,7 @@
 package tiles
 
 import (
+	"bytes"
 	"database/sql"
 	"github.com/allegro/bigcache"
 	"github.com/ruptivespatial/chopper/utils"
@@ -19,22 +20,31 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"bytes"
+	"path/filepath"
+	"encoding/json"
 )
 
 //TileManager manages the retrieval and caching of tiles
 type TileManager struct {
 	cache       *bigcache.BigCache
-	dbs         []*sql.DB
-	prepStmts   []*sql.Stmt
+	Metadatas   []DBMetadata
 	fullyCached bool
+}
+//DBMetadata holds all info and object for the various mbtile files
+type DBMetadata struct {
+
+	Id string
+	Fields map[string]string
+	LayerInfo interface{}
+	Conn *sql.DB `json:"-"`
+	Prep *sql.Stmt `json:"-"`
 }
 
 //GetTile returns a tile based on a z/x/y request
 func (tm *TileManager) GetTile(z int, x int, y int) (*gophertile.Tile, []byte) {
-//func (tm *TileManager) GetTile(z string, x string, y string) *T"ile {
+	//func (tm *TileManager) GetTile(z string, x string, y string) *T"ile {
 
-	tile := gophertile.Tile{x,y,z}
+	tile := gophertile.Tile{x, y, z}
 	var tiledata []byte
 	key := buildKey(z, x, y)
 	tiledata, err := tm.cache.Get(key)
@@ -44,8 +54,8 @@ func (tm *TileManager) GetTile(z int, x int, y int) (*gophertile.Tile, []byte) {
 
 		if !tm.fullyCached {
 			//iterate over databases and look for a tile
-			for _, stmt := range tm.prepStmts {
-				row := stmt.QueryRow(z, x, y)
+			for _, metadata := range tm.Metadatas {
+				row := metadata.Prep.QueryRow(z, x, y)
 				row.Scan(&tiledata)
 				if tiledata != nil {
 					break
@@ -62,7 +72,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 	tm := TileManager{}
 	utils.GetLogging().Info("Initializing tile manager...")
-
+	tm.Metadatas = make([]DBMetadata,0)
 	//initialize cache....100mb by default
 	config := bigcache.Config{Shards: 1024, Verbose: false, HardMaxCacheSize: utils.GetSettings().GetCacheSizeMB() * 1000}
 	cache, initErr := bigcache.NewBigCache(config)
@@ -73,9 +83,6 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 	}
 	utils.GetLogging().Debug("Cache initialized")
 
-	var conns = make([]*sql.DB, 0)
-	var preps = make([]*sql.Stmt, 0)
-
 	for _, connStr := range mbtilePath {
 
 		fi, err := os.Stat(connStr)
@@ -84,11 +91,31 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 			continue
 		}
 
+
 		// Open database file
 		db, err := sql.Open("sqlite3", connStr)
-		conns = append(conns, db)
 		if err != nil {
 			utils.GetLogging().Error("Error opening database!")
+			continue
+		}
+		//initialize database info
+		dbMetadata := DBMetadata{}
+		_,dbMetadata.Id = filepath.Split(connStr)
+		dbMetadata.Fields = make(map[string]string)
+		dbMetadata.Conn = db
+
+		//load metadata
+		metadataRows, err := db.Query("Select name, value FROM metadata")
+		for metadataRows.Next() {
+			var name string
+			var val string
+			metadataRows.Scan(&name, &val)
+			if name == "json" {
+				json.Unmarshal(bytes.NewBufferString(val).Bytes(),&dbMetadata.LayerInfo)
+			} else {
+				dbMetadata.Fields[name] = val
+			}
+			utils.GetLogging().Warn("key %v val: %v", name,val)
 		}
 
 		//see if we can fit the whole thing...
@@ -109,12 +136,10 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 		////prepare statement
 		prepStmt, _ := db.Prepare("SELECT tile_data as tile FROM tiles where zoom_level=? AND tile_column=? AND tile_row=?")
-		preps = append(preps, prepStmt)
+		dbMetadata.Prep =  prepStmt
+		tm.Metadatas = append(tm.Metadatas, dbMetadata)
 
 	}
-	tm.prepStmts = preps
-	tm.dbs = conns
-
 	return &tm
 
 }

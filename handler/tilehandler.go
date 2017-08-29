@@ -16,14 +16,14 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/tingold/gophertile/gophertile"
+	"github.com/ruptivespatial/chopper/tiles"
 	"github.com/ruptivespatial/chopper/utils"
+	"github.com/tingold/gophertile/gophertile"
 	"io"
 	"math"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/ruptivespatial/chopper/tiles"
 )
 
 //Tilehandler implements the handle method and takes care of http crap while delegating to the tilemanager for actual
@@ -35,13 +35,12 @@ type Tilehandler struct {
 //Handle implements the httprouter method...
 func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	y,_ := strconv.Atoi(strings.TrimSuffix(ps.ByName("y"), ".pbf"))
-	z,_ := strconv.Atoi(ps.ByName("z"))
-	x, _:= strconv.Atoi(ps.ByName("x"))
+	y, _ := strconv.Atoi(strings.TrimSuffix(ps.ByName("y"), ".pbf"))
+	z, _ := strconv.Atoi(ps.ByName("z"))
+	x, _ := strconv.Atoi(ps.ByName("x"))
 	yInt := normalizeY(y, z)
 
 	t, data := th.Manager.GetTile(z, x, int(yInt))
-
 
 	if data == nil {
 		utils.GetLogging().Warn(fmt.Sprintf("Tile not found for %v/%v/%v", ps.ByName("z"), ps.ByName("x"), yInt))
@@ -77,8 +76,8 @@ func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprou
 
 	}
 }
-func buildUrl(tile *gophertile.Tile) string{
-	//return "/tiles/" + t.ZStr() + "/" + t.XStr() + "/" + t.YStr() + ".pbf"
+func buildUrl(tile *gophertile.Tile) string {
+
 	buf := bytes.NewBufferString("/tiles")
 	buf.WriteString(strconv.Itoa(tile.Z))
 	buf.WriteString("/")

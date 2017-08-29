@@ -25,6 +25,7 @@ import (
 
 var tm *tiles.TileManager
 var th *handler.Tilehandler
+var infoHandler *handler.InfoHandler
 
 func main() {
 	//parse out settings
@@ -42,6 +43,7 @@ func main() {
 	th = new(handler.Tilehandler)
 	tm = tiles.NewTileManager(settings.GetDBs(), true)
 	th.Manager = *tm
+	infoHandler = &handler.InfoHandler{ tm}
 
 	//create the HTTP Router -- the tiles go to the tilehandler which uses the tile manager to access the DB
 	//and potentially cache
@@ -54,6 +56,8 @@ func main() {
 	router.GET("/style/osm-liberty.json", ph.Handle)
 	router.GET("/style/osm-liberty@2x.json", ph.Handle)
 	router.GET("/style/osm-liberty/osm-liberty@2x.json", ph.Handle)
+
+	router.GET("/info", infoHandler.Handle)
 
 	//any non tile request will default to serving files
 	//files are NOT actually files but stored in GO code using
