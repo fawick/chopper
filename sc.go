@@ -62,8 +62,11 @@ func main() {
 	//any non tile request will default to serving files
 	//files are NOT actually files but stored in GO code using
 	// https://github.com/elazarl/go-bindata-assetfs
-	fs := http.FileServer(assetFS())
-	router.NotFound = fs
+	fs, ok := http.FileServer(assetFS()).(http.HandlerFunc)
+	if ok{
+		router.NotFound = fs
+	}
+	
 
 	//create server
 	srv := &http.Server{
