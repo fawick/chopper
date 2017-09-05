@@ -1,0 +1,13 @@
+package: github.com/ruptivespatial/chopper
+import:
+- package: github.com/allegro/bigcache
+- package: github.com/elazarl/go-bindata-assetfs
+- package: github.com/julienschmidt/httprouter
+  version: ^1.1.0
+- package: github.com/mattn/go-sqlite3
+  version: ^1.2.0
+- package: github.com/namsral/flag
+  version: ^1.7.4-pre
+- package: github.com/tingold/gophertile
+  subpackages:
+  - gophertile
