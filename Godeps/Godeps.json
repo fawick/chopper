@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/ruptivespatial/chopper",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/allegro/bigcache",
+			"Rev": "b6bd76ad0f792508efc589a2790e2aee1d0f240d"
+		},
+		{
+			"ImportPath": "github.com/allegro/bigcache/queue",
+			"Rev": "b6bd76ad0f792508efc589a2790e2aee1d0f240d"
+		},
+		{
+			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
+			"Rev": "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43"
+		},
+		{
+			"ImportPath": "github.com/julienschmidt/httprouter",
+			"Comment": "v1.1-44-g6f3f391",
+			"Rev": "6f3f3919c8781ce5c0509c83fffc887a7830c938"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Comment": "v1.2.0-80-gcf7286f",
+			"Rev": "cf7286f069c3ef596efcc87781a4653a2e7607bd"
+		},
+		{
+			"ImportPath": "github.com/namsral/flag",
+			"Comment": "v1.7.4-alpha-2-gf522f7f",
+			"Rev": "f522f7fa700925bcdf4ee0daf0952167618242ef"
+		},
+		{
+			"ImportPath": "github.com/tingold/gophertile/gophertile",
+			"Rev": "c237a72656556efe9cb4663dbda15aff4ccb8caf"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "b4690f45fa1cafc47b1c280c2e75116efe40cc13"
+		}
+	]
+}
