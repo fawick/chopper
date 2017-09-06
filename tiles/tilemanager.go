@@ -114,7 +114,9 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 			} else {
 				dbMetadata.Fields[name] = val
 			}
+
 			utils.GetLogging().Warn("key %v val: %v", name, val)
+
 		}
 
 		//see if we can fit the whole thing...

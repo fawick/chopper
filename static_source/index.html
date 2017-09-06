@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Squirrel Chopper</title>
+    <title>Chopper</title>
 
     <style>
         body {
@@ -34,10 +34,18 @@
 <body>
     <div id="main">
         <div id="heading">
-        Welcome to the Bryan Lane's very own demo tile server!
+        Welcome to Chopper!
         </div>
         <div id="content">
-            The server is up a running. Check out a demo <a href="/demo/index.html">here</a>. Loaded up with data for all of Ireland.
+            Chopper is a high speed tile server written in Go that supports things like <a href="https://en.wikipedia.org/wiki/HTTP/2">HTTP2</a>,
+             preemptive loading of tiles using <a href="https://en.wikipedia.org/wiki/HTTP/2_Server_Push">Server Push</a> and in memory LRU caching of tiles.
+             All in all this helps Chopper provide an amazing experience - in a really lightweight package. <br />
+            The server is up a running. Check out: <ul>
+            <li>
+                Demo <a href="/demo/index.html">here</a>
+            </li>
+            <li>JSON Information endpoint <a href="/info">here</a></li>
+        </ul>
         </div>
     </div>
 </body>

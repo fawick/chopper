@@ -78,7 +78,7 @@ func (th *Tilehandler) Handle(w http.ResponseWriter, r *http.Request, ps httprou
 }
 func buildUrl(tile *gophertile.Tile) string {
 
-	buf := bytes.NewBufferString("/tiles")
+	buf := bytes.NewBufferString("/tiles/")
 	buf.WriteString(strconv.Itoa(tile.Z))
 	buf.WriteString("/")
 	buf.WriteString(strconv.Itoa(tile.X))

@@ -1,7 +1,7 @@
 FROM frolvlad/alpine-glibc
 
-COPY squirrelchopper /usr/bin/squirrelchopper
+COPY chopper /usr/bin/chopper
 ADD resources /resources
 EXPOSE 8000
 WORKDIR /
-ENTRYPOINT ["squirrelchopper"]
+ENTRYPOINT ["chopper"]
