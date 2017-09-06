@@ -2,3 +2,4 @@
 *.mbtiles
 *.iml
 out
+vendor

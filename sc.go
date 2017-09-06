@@ -43,7 +43,7 @@ func main() {
 	th = new(handler.Tilehandler)
 	tm = tiles.NewTileManager(settings.GetDBs(), true)
 	th.Manager = *tm
-	infoHandler = &handler.InfoHandler{ tm}
+	infoHandler = &handler.InfoHandler{tm}
 
 	//create the HTTP Router -- the tiles go to the tilehandler which uses the tile manager to access the DB
 	//and potentially cache
@@ -62,11 +62,13 @@ func main() {
 	//any non tile request will default to serving files
 	//files are NOT actually files but stored in GO code using
 	// https://github.com/elazarl/go-bindata-assetfs
-	fs, ok := http.FileServer(assetFS()).(http.HandlerFunc)
-	if ok{
-		router.NotFound = fs
-	}
-	
+	fs := http.FileServer(assetFS())
+	//.(http.HandlerFunc)
+	//if ok {
+	router.NotFound = fs
+	//} else {
+	//	router.NotFound = fs
+	//}
 
 	//create server
 	srv := &http.Server{

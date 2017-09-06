@@ -14,14 +14,14 @@ package tiles
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"github.com/allegro/bigcache"
 	"github.com/ruptivespatial/chopper/utils"
 	"github.com/tingold/gophertile/gophertile"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
-	"path/filepath"
-	"encoding/json"
 )
 
 //TileManager manages the retrieval and caching of tiles
@@ -30,14 +30,14 @@ type TileManager struct {
 	Metadatas   []DBMetadata
 	fullyCached bool
 }
+
 //DBMetadata holds all info and object for the various mbtile files
 type DBMetadata struct {
-
-	Id string
-	Fields map[string]string
+	Id        string
+	Fields    map[string]string
 	LayerInfo interface{}
-	Conn *sql.DB `json:"-"`
-	Prep *sql.Stmt `json:"-"`
+	Conn      *sql.DB   `json:"-"`
+	Prep      *sql.Stmt `json:"-"`
 }
 
 //GetTile returns a tile based on a z/x/y request
@@ -72,7 +72,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 	tm := TileManager{}
 	utils.GetLogging().Info("Initializing tile manager...")
-	tm.Metadatas = make([]DBMetadata,0)
+	tm.Metadatas = make([]DBMetadata, 0)
 	//initialize cache....100mb by default
 	config := bigcache.Config{Shards: 1024, Verbose: false, HardMaxCacheSize: utils.GetSettings().GetCacheSizeMB() * 1000}
 	cache, initErr := bigcache.NewBigCache(config)
@@ -91,7 +91,6 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 			continue
 		}
 
-
 		// Open database file
 		db, err := sql.Open("sqlite3", connStr)
 		if err != nil {
@@ -100,7 +99,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 		}
 		//initialize database info
 		dbMetadata := DBMetadata{}
-		_,dbMetadata.Id = filepath.Split(connStr)
+		_, dbMetadata.Id = filepath.Split(connStr)
 		dbMetadata.Fields = make(map[string]string)
 		dbMetadata.Conn = db
 
@@ -111,11 +110,11 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 			var val string
 			metadataRows.Scan(&name, &val)
 			if name == "json" {
-				json.Unmarshal(bytes.NewBufferString(val).Bytes(),&dbMetadata.LayerInfo)
+				json.Unmarshal(bytes.NewBufferString(val).Bytes(), &dbMetadata.LayerInfo)
 			} else {
 				dbMetadata.Fields[name] = val
 			}
-			utils.GetLogging().Warn("key %v val: %v", name,val)
+			utils.GetLogging().Warn("key %v val: %v", name, val)
 		}
 
 		//see if we can fit the whole thing...
@@ -136,7 +135,7 @@ func NewTileManager(mbtilePath []string, useCache bool) *TileManager {
 
 		////prepare statement
 		prepStmt, _ := db.Prepare("SELECT tile_data as tile FROM tiles where zoom_level=? AND tile_column=? AND tile_row=?")
-		dbMetadata.Prep =  prepStmt
+		dbMetadata.Prep = prepStmt
 		tm.Metadatas = append(tm.Metadatas, dbMetadata)
 
 	}
