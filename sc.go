@@ -1,5 +1,4 @@
 /*
-* Copyright 2017-present Tom Ingold / Ruptive.io
 * Licensed under the Apache License, Version 2.0 (the "License").
 * You may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -12,12 +11,12 @@
 package main
 
 import (
+	"github.com/boundlessgeo/chopper/handler"
+	"github.com/boundlessgeo/chopper/tiles"
+	"github.com/boundlessgeo/chopper/utils"
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/namsral/flag"
-	"github.com/ruptivespatial/chopper/handler"
-	"github.com/ruptivespatial/chopper/tiles"
-	"github.com/ruptivespatial/chopper/utils"
 	"log"
 	"net/http"
 	"strconv"

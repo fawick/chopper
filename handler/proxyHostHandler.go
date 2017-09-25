@@ -14,9 +14,9 @@ package handler
 
 import (
 	"fmt"
+	"github.com/boundlessgeo/chopper/utils"
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ruptivespatial/chopper/utils"
 	"net/http"
 	"strings"
 )

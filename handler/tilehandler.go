@@ -1,5 +1,4 @@
 /*Package handler ...
- * Copyright 2017-present Tom Ingold / Ruptive.io
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +14,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"github.com/boundlessgeo/chopper/tiles"
+	"github.com/boundlessgeo/chopper/utils"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ruptivespatial/chopper/tiles"
-	"github.com/ruptivespatial/chopper/utils"
 	"github.com/tingold/gophertile/gophertile"
 	"io"
 	"math"
