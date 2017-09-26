@@ -1,3 +1,4 @@
+sc
 .idea
 *.mbtiles
 *.iml
@@ -6,5 +7,5 @@ vendor
 chopper
 *.crt
 *.key
-resources/*.key
-resources/*.crt
+resources/test.key
+resources/test.crt
