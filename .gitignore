@@ -9,3 +9,9 @@ chopper
 *.key
 resources/test.key
 resources/test.crt
+
+*.key
+
+*.key
+
+*.crt
