@@ -15,3 +15,7 @@ resources/test.crt
 *.key
 
 *.crt
+
+resources/test.key
+
+resources/test.crt
