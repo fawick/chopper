@@ -4,4 +4,7 @@
 out
 vendor
 chopper
-
+*.crt
+*.key
+resources/*.key
+resources/*.crt
