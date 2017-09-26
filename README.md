@@ -34,3 +34,4 @@ involved in the solftware
 - https://openmaptiles.org
 - https://github.com/mapbox/mapbox-gl-js 
 - https://github.com/elazarl/go-bindata-assetfs
+- https://github.com/tingold/gophertile
