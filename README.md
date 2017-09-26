@@ -23,7 +23,7 @@ the moment this still uses glibc instead of Musl (native to Alpine) and provides
 SC has a small memory footprint as well -- using about 100mb of ram even with a full cache. 
 
 ### What's up with the name?
-It was originally inspired by a garden-wind-powered-metal-thing in my back yard thatsquirrels love to climb on. It rotates and looks like its going to 
+It was originally inspired by a garden-wind-powered-metal-thing in my back yard that squirrels love to climb on. It rotates and looks like its going to 
 chop them up -- hence the original name squirrelchopper.  Watching it while drinking coffee one day I was struck at how efficiently it moved
 and thought it would be a good name for what this is trying to accomplish. It's since be shortened to "Chopper" as squirrels really aren't 
 involved in the solftware
