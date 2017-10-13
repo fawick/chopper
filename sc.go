@@ -20,6 +20,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"github.com/rs/cors"
 )
 
 var tm *tiles.TileManager
@@ -62,17 +63,16 @@ func main() {
 	//files are NOT actually files but stored in GO code using
 	// https://github.com/elazarl/go-bindata-assetfs
 	fs := http.FileServer(assetFS())
-	//.(http.HandlerFunc)
-	//if ok {
+
+
 	router.NotFound = fs
-	//} else {
-	//	router.NotFound = fs
-	//}
+	//add in cors support and inject it into the processing chain
+	corshandler := cors.AllowAll().Handler(router)
 
 	//create server
 	srv := &http.Server{
 		Addr:    ":" + strconv.Itoa(settings.GetPort()),
-		Handler: router,
+		Handler: corshandler,
 	}
 
 	logger.Info("Starting server on port %v", settings.GetPort())
